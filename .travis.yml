@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+  - 12
+before_install:
+  - npm install -g grunt-cli
+notifications:
+  email:
+    - andris@kreata.ee
