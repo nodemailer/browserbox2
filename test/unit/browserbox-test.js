@@ -1,3 +1,6 @@
+/* eslint no-unused-expressions: 0, global-require: 0, object-shorthand:0 */
+/* global define, sinon */
+
 'use strict';
 
 (function(factory) {
@@ -7,14 +10,14 @@
         module.exports = factory(require('sinon'), require('chai'), require('axe-logger'), require('browserbox'), require('imap-handler'), require('./fixtures/mime-torture-bodystructure'), require('./fixtures/envelope'));
     }
 }(function(sinon, chai, axe, BrowserBox, imapHandler, mimeTorture, testEnvelope) {
-    var expect = chai.expect;
+    let expect = chai.expect;
     chai.Assertion.includeStack = true;
 
     describe('browserbox unit tests', function() {
         // don't log in the tests
         axe.removeAppender(axe.defaultAppender);
 
-        var br;
+        let br;
 
         beforeEach(function() {
             br = new BrowserBox();
@@ -159,6 +162,7 @@
                     arguments[arguments.length - 1]({}, done);
                 });
                 br.exec('TEST', function(err, response, next) {
+                    console.log(err)
                     expect(br.client.exec.args[0][0]).to.equal('TEST');
                     next();
                 });
@@ -270,7 +274,7 @@
                 sinon.stub(br.client, 'upgrade');
                 sinon.stub(br, 'exec', function(cmd, cb) {
                     expect(cmd).to.equal('STARTTLS');
-                    cb();
+                    setImmediate(cb);
                     expect(br.client.upgrade.callCount).to.equal(1);
                     expect(br.capability.length).to.equal(0);
 
@@ -571,7 +575,7 @@
             // expressed as an atom.
             it('should call CREATE with a string payload', function(done) {
                 sinon.stub(br, 'exec').yields(null, null, done);
-                var mailboxName = 'foo';
+                let mailboxName = 'foo';
                 br.createMailbox(mailboxName, function(err) {
                     expect(err).to.not.exist;
 
@@ -589,8 +593,8 @@
             it('should call mutf7 encode the argument', function(done) {
                 sinon.stub(br, 'exec').yields(null, null, done);
                 // From RFC 3501
-                var localName = '~peter/mail/\u53f0\u5317/\u65e5\u672c\u8a9e';
-                var serverName = '~peter/mail/&U,BTFw-/&ZeVnLIqe-';
+                let localName = '~peter/mail/\u53f0\u5317/\u65e5\u672c\u8a9e';
+                let serverName = '~peter/mail/&U,BTFw-/&ZeVnLIqe-';
                 br.createMailbox(localName, function(err) {
                     expect(err).to.not.exist;
 
@@ -606,14 +610,14 @@
             });
 
             it('should treat an ALREADYEXISTS response as success', function(done) {
-                var fakeErr = {
+                let fakeErr = {
                     code: 'ALREADYEXISTS'
                 };
-                var fakeResp = {
+                let fakeResp = {
                     code: 'ALREADYEXISTS'
                 };
                 sinon.stub(br, 'exec').yields(fakeErr, fakeResp, done);
-                var mailboxName = 'foo';
+                let mailboxName = 'foo';
                 br.createMailbox(mailboxName, function(err, alreadyExists) {
                     expect(err).to.not.exist;
                     expect(alreadyExists).to.be.true;
@@ -1588,7 +1592,7 @@
             });
 
             it('should parse bodystructure with unicode filename', function() {
-                var input = [
+                let input = [
                     [{
                             type: 'STRING',
                             value: 'APPLICATION'
@@ -1633,7 +1637,7 @@
                     null
                 ];
 
-                var expected = {
+                let expected = {
                     childNodes: [{
                         part: '1',
                         type: 'application/octet-stream',
@@ -1956,7 +1960,7 @@
 
         describe('#_ensurePath', function() {
             it('should create the path if not present', function() {
-                var tree = {
+                let tree = {
                     children: []
                 };
                 expect(br._ensurePath(tree, 'hello/world', '/')).to.deep.equal({
@@ -1981,7 +1985,7 @@
             });
 
             it('should return existing path if possible', function() {
-                var tree = {
+                let tree = {
                     children: [{
                         name: 'hello',
                         delimiter: '/',
@@ -2005,7 +2009,7 @@
             });
 
             it('should handle case insensitive Inbox', function() {
-                var tree = {
+                let tree = {
                     children: []
                 };
                 expect(br._ensurePath(tree, 'Inbox/world', '/')).to.deep.equal({

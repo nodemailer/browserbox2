@@ -1,6 +1,7 @@
-module.exports = function(grunt) {
-    'use strict';
+/* eslint no-unused-expressions:0, global-require:0, no-sequences:0, no-invalid-this: 0 */
+'use strict';
 
+module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         jshint: {
@@ -71,9 +72,7 @@ module.exports = function(grunt) {
                 expand: true,
                 flatten: true,
                 cwd: 'src/',
-                src: [
-                    '*.js',
-                ],
+                src: ['*.js'],
                 dest: 'test/lib/'
             }
         },
@@ -91,59 +90,61 @@ module.exports = function(grunt) {
 
     // Tasks
     grunt.registerTask('hoodiecrow', function() {
-        var hoodiecrow, server, port, options;
+        let hoodiecrow, server, port, options;
 
-        hoodiecrow = require("hoodiecrow"),
-        options = {
-            secureConnection: false,
-            storage: {
-                "INBOX":{
-                    messages: [
-                        {raw: "Subject: hello 1\r\n\r\nWorld 1!"},
-                        {raw: "Subject: hello 2\r\n\r\nWorld 2!", flags: ["\\Seen"]},
-                        {raw: "Subject: hello 3\r\n\r\nWorld 3!", uid: 555},
-                        {raw: "From: sender name <sender@example.com>\r\nTo: Receiver name <receiver@example.com>\r\nSubject: hello 4\r\nMessage-Id: <abcde>\r\nDate: Fri, 13 Sep 2013 15:01:00 +0300\r\n\r\nWorld 4!"},
-                        {raw: "Subject: hello 5\r\n\r\nWorld 5!", flags: ["$MyFlag", "\\Deleted"], uid: 557},
-                        {raw: "Subject: hello 6\r\n\r\nWorld 6!"}
-                    ]
-                },
-                "":{
-                    "separator": "/",
-                    "folders":{
-                        "[Gmail]":{
-                            "flags": ["\\Noselect"],
-                            "folders": {
-                                "All Mail":{
-                                    "special-use": "\\All"
-                                },
-                                "Drafts":{
-                                    "special-use": "\\Drafts"
-                                },
-                                "Important":{
-                                    "special-use": "\\Important"
-                                },
-                                "Sent Mail":{
-                                    "special-use": "\\Sent"
-                                },
-                                "Spam":{
-                                    "special-use": "\\Junk"
-                                },
-                                "Starred":{
-                                    "special-use": "\\Flagged"
-                                },
-                                "Trash":{
-                                    "special-use": "\\Trash"
+        (hoodiecrow = require('hoodiecrow')),
+            (options = {
+                secureConnection: false,
+                storage: {
+                    INBOX: {
+                        messages: [
+                            { raw: 'Subject: hello 1\r\n\r\nWorld 1!' },
+                            { raw: 'Subject: hello 2\r\n\r\nWorld 2!', flags: ['\\Seen'] },
+                            { raw: 'Subject: hello 3\r\n\r\nWorld 3!', uid: 555 },
+                            {
+                                raw:
+                                    'From: sender name <sender@example.com>\r\nTo: Receiver name <receiver@example.com>\r\nSubject: hello 4\r\nMessage-Id: <abcde>\r\nDate: Fri, 13 Sep 2013 15:01:00 +0300\r\n\r\nWorld 4!'
+                            },
+                            { raw: 'Subject: hello 5\r\n\r\nWorld 5!', flags: ['$MyFlag', '\\Deleted'], uid: 557 },
+                            { raw: 'Subject: hello 6\r\n\r\nWorld 6!' }
+                        ]
+                    },
+                    '': {
+                        separator: '/',
+                        folders: {
+                            '[Gmail]': {
+                                flags: ['\\Noselect'],
+                                folders: {
+                                    'All Mail': {
+                                        'special-use': '\\All'
+                                    },
+                                    Drafts: {
+                                        'special-use': '\\Drafts'
+                                    },
+                                    Important: {
+                                        'special-use': '\\Important'
+                                    },
+                                    'Sent Mail': {
+                                        'special-use': '\\Sent'
+                                    },
+                                    Spam: {
+                                        'special-use': '\\Junk'
+                                    },
+                                    Starred: {
+                                        'special-use': '\\Flagged'
+                                    },
+                                    Trash: {
+                                        'special-use': '\\Trash'
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        };
+            });
         port = 10000;
 
-        server = hoodiecrow(options),
-        grunt.log.writeln('> Starting IMAP server on port ' + port);
+        (server = hoodiecrow(options)), grunt.log.writeln('> Starting IMAP server on port ' + port);
         server.listen(port, function() {
             grunt.log.write('> Listening...\n');
         });

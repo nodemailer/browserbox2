@@ -1,6 +1,8 @@
-# browserbox
+# browserbox2
 
-IMAP client for browsers
+IMAP client not for browsers but for node
+
+> **NB!** browserbox2 is not a full featured IMAP client. It is a patched version of browserbox that only has some working components
 
 [![Build Status](https://travis-ci.org/whiteout-io/browserbox.png?branch=master)](https://travis-ci.org/whiteout-io/browserbox)
 
@@ -22,7 +24,7 @@ Please take a look at the [tcp-socket documentation](https://github.com/whiteout
 
 This module uses the Promises API, so make sure your platform either supports `Promise` constructor natively, or use the [es6-promise](https://www.npmjs.com/package/es6-promise) polyfill.
 
-    var ES6Promise = require('es6-promises');
+    let ES6Promise = require('es6-promises');
     ES6Promise.polyfill();
 
 ## Installation
@@ -50,7 +52,7 @@ This exposes the constructor `BrowserBox` as a global variable
 
 ## API
 
-    var BrowserBox = require('browserbox')
+    let BrowserBox = require('browserbox')
 
 ## Create connection to an IMAP server
 
@@ -60,26 +62,26 @@ new BrowserBox(host[, port][, options]) → IMAP client object
 
 Where
 
-  * **host** is to hostname to connect to
-  * **port** (optional) is the port to connect to (defaults to 143)
-  * **options** (optional) is the options object
-    * **auth** is the authentication information object
-      * **user** is the username of the user (also applies to Oauth2)
-      * **pass** is the password of the user
-      * **xoauth2** is the OAuth2 access token to be used instead of password
-    * **id** (optional) is the identification object for [RFC2971](http://tools.ietf.org/html/rfc2971#section-3.3) (ex. `{name: 'myclient', version: '1'}`)
-    * **useSecureTransport** (optional) enables TLS
-    * **ca** (optional) (only in conjunction with the [TCPSocket shim](https://github.com/whiteout-io/tcp-socket)) if you use TLS with forge, pin a PEM-encoded certificate as a string. Please refer to the [tcp-socket documentation](https://github.com/whiteout-io/tcp-socket) for more information!
-    * **tlsWorkerPath** (optional) (only in conjunction with the [TCPSocket shim](https://github.com/whiteout-io/tcp-socket)) if you use TLS with forge, this path indicates where the file for the TLS Web Worker is located. Please refer to the [tcp-socket documentation](https://github.com/whiteout-io/tcp-socket) for more information!
-    * **ignoreTLS** – if set to true, do not call STARTTLS before authentication even if the host advertises support for it
-    * **requireTLS** – if set to true, always use STARTTLS before authentication even if the host does not advertise it. If STARTTLS fails, do not try to authenticate the user
+-   **host** is to hostname to connect to
+-   **port** (optional) is the port to connect to (defaults to 143)
+-   **options** (optional) is the options object
+    -   **auth** is the authentication information object
+        -   **user** is the username of the user (also applies to Oauth2)
+        -   **pass** is the password of the user
+        -   **xoauth2** is the OAuth2 access token to be used instead of password
+    -   **id** (optional) is the identification object for [RFC2971](http://tools.ietf.org/html/rfc2971#section-3.3) (ex. `{name: 'myclient', version: '1'}`)
+    -   **useSecureTransport** (optional) enables TLS
+    -   **ca** (optional) (only in conjunction with the [TCPSocket shim](https://github.com/whiteout-io/tcp-socket)) if you use TLS with forge, pin a PEM-encoded certificate as a string. Please refer to the [tcp-socket documentation](https://github.com/whiteout-io/tcp-socket) for more information!
+    -   **tlsWorkerPath** (optional) (only in conjunction with the [TCPSocket shim](https://github.com/whiteout-io/tcp-socket)) if you use TLS with forge, this path indicates where the file for the TLS Web Worker is located. Please refer to the [tcp-socket documentation](https://github.com/whiteout-io/tcp-socket) for more information!
+    -   **ignoreTLS** – if set to true, do not call STARTTLS before authentication even if the host advertises support for it
+    -   **requireTLS** – if set to true, always use STARTTLS before authentication even if the host does not advertise it. If STARTTLS fails, do not try to authenticate the user
 
 Default STARTTLS support is opportunistic – if the server advertises STARTTLS capability, the client tries to use it. If STARTTLS is not advertised, the clients sends passwords in the plain. You can use `ignoreTLS` and `requireTLS` to change this behavior by explicitly enabling or disabling STARTTLS usage.
 
 Example
 
 ```javascript
-var client = new BrowserBox('localhost', 143, {
+let client = new BrowserBox('localhost', 143, {
     auth: {
         user: 'testuser',
         pass: 'testpass'
@@ -113,7 +115,7 @@ client.onerror = function(err){}
 
 Where
 
-  * **err** is an error object
+-   **err** is an error object
 
 ### onclose
 
@@ -137,66 +139,66 @@ client.listMailboxes(callback)
 
 Where
 
-  * **callback** is the callback function with the following arguments
-    * **err** is an error object, only set if the request failed
-    * **mailboxes** is an object with the mailbox structure
+-   **callback** is the callback function with the following arguments
+    -   **err** is an error object, only set if the request failed
+    -   **mailboxes** is an object with the mailbox structure
 
 If callback is not specified, the method returns a Promise.
 
 Mailbox object is with the following structure
 
-  * **root** (boolean) `true` if the node is root
-  * **name** (string) unicode decoded name of the mailbox
-  * **path** (string) full path to the mailbox
-  * **delimiter** (string) path delimiting symbol.  In the event the server returns NIL for this (some servers do this for the INBOX), it will be coerced to a '/' at this time, but the behavior may be changed in the future depending on how the folder creation API is implemented.
-  * **listed** (boolean) mailbox was found in the LIST response
-  * **subscribed** (boolean) mailbox was found in the LSUB response
-  * **specialUse** (string) mailbox was identified as a special use mailbox ('\Trash', '\Sent', '\Junk' etc. see [RFC6154](http://tools.ietf.org/html/rfc6154#section-2))
-  * **flags** (array) a list of flags
-  * **children** (array) a list of child mailboxes
+-   **root** (boolean) `true` if the node is root
+-   **name** (string) unicode decoded name of the mailbox
+-   **path** (string) full path to the mailbox
+-   **delimiter** (string) path delimiting symbol. In the event the server returns NIL for this (some servers do this for the INBOX), it will be coerced to a '/' at this time, but the behavior may be changed in the future depending on how the folder creation API is implemented.
+-   **listed** (boolean) mailbox was found in the LIST response
+-   **subscribed** (boolean) mailbox was found in the LSUB response
+-   **specialUse** (string) mailbox was identified as a special use mailbox ('\Trash', '\Sent', '\Junk' etc. see [RFC6154](http://tools.ietf.org/html/rfc6154#section-2))
+-   **flags** (array) a list of flags
+-   **children** (array) a list of child mailboxes
 
 Example
 
 ```javascript
-client.listMailboxes(function(err, mailboxes){
+client.listMailboxes(function(err, mailboxes) {
     console.log(err || mailboxes);
 });
 ```
 
 ```json
 {
-  "root": true,
-  "children": [
-    {
-      "name": "INBOX",
-      "delimiter": "/",
-      "path": "INBOX",
-      "children": [],
-      "flags": ["\\HasNoChildren"],
-      "listed": true,
-      "subscribed": true
-    },
-    {
-      "name": "[Gmail]",
-      "delimiter": "/",
-      "path": "[Gmail]",
-      "flags": ["\\Noselect","\\HasChildren"],
-      "listed": true,
-      "subscribed": true,
-      "children": [
+    "root": true,
+    "children": [
         {
-          "name": "All Mail",
-          "delimiter": "/",
-          "path": "[Gmail]/All Mail",
-          "children": [],
-          "flags": ["\\HasNoChildren","\\All"],
-          "listed": true,
-          "specialUse": "\\All",
-          "subscribed": true
+            "name": "INBOX",
+            "delimiter": "/",
+            "path": "INBOX",
+            "children": [],
+            "flags": ["\\HasNoChildren"],
+            "listed": true,
+            "subscribed": true
+        },
+        {
+            "name": "[Gmail]",
+            "delimiter": "/",
+            "path": "[Gmail]",
+            "flags": ["\\Noselect", "\\HasChildren"],
+            "listed": true,
+            "subscribed": true,
+            "children": [
+                {
+                    "name": "All Mail",
+                    "delimiter": "/",
+                    "path": "[Gmail]/All Mail",
+                    "children": [],
+                    "flags": ["\\HasNoChildren", "\\All"],
+                    "listed": true,
+                    "specialUse": "\\All",
+                    "subscribed": true
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
 ```
 
@@ -215,21 +217,21 @@ These different INBOX names are mapped to the following object:
 
 ```json
 {
-  "root": true,
-  "children": [
-    {
-      "name": "INBOX",
-      "delimiter": "/",
-      "path": "INBOX",
-      "children": [
+    "root": true,
+    "children": [
         {
-          "name": "test",
-          "delimiter": "/",
-          "path": "Inbox/test",
+            "name": "INBOX",
+            "delimiter": "/",
+            "path": "INBOX",
+            "children": [
+                {
+                    "name": "test",
+                    "delimiter": "/",
+                    "path": "Inbox/test"
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
 ```
 
@@ -238,27 +240,27 @@ These different INBOX names are mapped to the following object:
 List available namespaces with `listNamespaces()`. If [NAMESPACE](https://tools.ietf.org/html/rfc2342) extension is not supported, the method returns `false`.
 
 ```javascript
-client.listNamespaces(callback)
+client.listNamespaces(callback);
 ```
 
 Where
 
-  * **callback** is the callback function with the following arguments
-    * **err** is an error object, only set if the request failed
-    * **namespaces** is an object with the namespace values or `false` if NAMESPACE is not supported
+-   **callback** is the callback function with the following arguments
+    -   **err** is an error object, only set if the request failed
+    -   **namespaces** is an object with the namespace values or `false` if NAMESPACE is not supported
 
 If callback is not specified, the method returns a Promise.
 
 Namespace object is with the following structure
 
-  * **personal** is an array of namespace elements or `false` for Personal Namespace
-  * **users** is an array of namespace elements or `false` for Other Users' Namespace
-  * **shared** is an array of namespace elements or `false` for Shared Namespace
+-   **personal** is an array of namespace elements or `false` for Personal Namespace
+-   **users** is an array of namespace elements or `false` for Other Users' Namespace
+-   **shared** is an array of namespace elements or `false` for Shared Namespace
 
 Namespace element object has the following structure
 
-  * **prefix** is the prefix string
-  * **delimiter** is the hierarchy delimiter.  This can be null for some servers but will usually be a string.
+-   **prefix** is the prefix string
+-   **delimiter** is the hierarchy delimiter. This can be null for some servers but will usually be a string.
 
 **NB!** Namespace_Response_Extensions are not supported (extension data is silently skipped)
 
@@ -267,7 +269,7 @@ Namespaces should be checked before attempting to create new mailboxes - most pr
 Example
 
 ```javascript
-client.listNamespaces(function(err, namespaces){
+client.listNamespaces(function(err, namespaces) {
     console.log(err || namespaces);
 });
 ```
@@ -287,8 +289,8 @@ client.listNamespaces(function(err, namespaces){
 
 ## Create mailbox
 
-Create a folder with the given path, automatically handling utf-7 encoding.  You
-currently need to manually build the path string yourself.  (There is potential
+Create a folder with the given path, automatically handling utf-7 encoding. You
+currently need to manually build the path string yourself. (There is potential
 for future enhancement to provide assistance.)
 
 If the server indicates a failure but that the folder already exists with the
@@ -317,27 +319,27 @@ client.selectMailbox(path[, options], callback)
 
 Where
 
-  * **path** is the full path to the mailbox (see *path* property with `listMailboxes`)
-  * **options** *optional* options object with the following properties
-    * **condstore** if set to `true` adds (CONDSTORE) option when selecting
-    * **readOnly** if set to `true` uses `EXAMINE` instead of `SELECT`
-  * **callback** is the callback function with the following arguments
-    * **err** is an error object, only set if the request failed
-    * **mailboxInfo** is an object with mailbox properties
-      * **exists** (number) the count of messages in the selected mailbox
-      * **flags** (array) an array of flags used in the selected mailbox
-      * **permanentFlags** (array) an array of permanent flags available to use in the selected mailbox
-      * **readOnly** (boolean) `true` if the mailbox is in read only mode
-      * **uidValidity** (number) UIDValidity value
-      * **uidNext** (number) predicted next UID value
-      * **highestModseq** (string) (with CONDSTORE only) highest modseq value (javascript can't handle 64bit uints so this is a string)
+-   **path** is the full path to the mailbox (see _path_ property with `listMailboxes`)
+-   **options** _optional_ options object with the following properties
+    -   **condstore** if set to `true` adds (CONDSTORE) option when selecting
+    -   **readOnly** if set to `true` uses `EXAMINE` instead of `SELECT`
+-   **callback** is the callback function with the following arguments
+    -   **err** is an error object, only set if the request failed
+    -   **mailboxInfo** is an object with mailbox properties
+        -   **exists** (number) the count of messages in the selected mailbox
+        -   **flags** (array) an array of flags used in the selected mailbox
+        -   **permanentFlags** (array) an array of permanent flags available to use in the selected mailbox
+        -   **readOnly** (boolean) `true` if the mailbox is in read only mode
+        -   **uidValidity** (number) UIDValidity value
+        -   **uidNext** (number) predicted next UID value
+        -   **highestModseq** (string) (with CONDSTORE only) highest modseq value (javascript can't handle 64bit uints so this is a string)
 
 If callback is not specified, the method returns a Promise.
 
 Example
 
 ```javascript
-client.selectMailbox('INBOX', function(err, mailbox){
+client.selectMailbox('INBOX', function(err, mailbox) {
     console.log(err || mailbox);
 });
 ```
@@ -346,14 +348,8 @@ client.selectMailbox('INBOX', function(err, mailbox){
 {
     "readOnly": false,
     "exists": 6596,
-    "flags": [
-        "\\Answered",
-        "\\Flagged"
-    ],
-    "permanentFlags": [
-        "\\Answered",
-        "\\Flagged"
-    ],
+    "flags": ["\\Answered", "\\Flagged"],
+    "permanentFlags": ["\\Answered", "\\Flagged"],
     "uidValidity": 2,
     "uidNext": 38361,
     "highestModseq": "3682918"
@@ -377,14 +373,14 @@ client.listMessages(sequence, query[, options], callback)
 
 Where
 
-  * **sequence** defines the range of sequence numbers or UID values (if `byUid` option is set to true). Example: '1', '1:*', '1,2:3,4' etc.
-  * **query** is an array of keys that need to be fetched. Example: ['uid', 'flags', 'body.peek[headers (date)]']
-  * **options** is an optional options object
-    * **byUid** if `true` executes `UID FETCH` instead of `FETCH`
-    * **changedSince** is the modseq filter. Only messages with higher modseq value will be returned
-  * **callback** is the callback function to run once all me messages are processed with the following arguments
-    * **err** is an error object, only set if the request failed
-    * **messages** is an array of messages from the provided sequence range
+-   **sequence** defines the range of sequence numbers or UID values (if `byUid` option is set to true). Example: '1', '1:\*', '1,2:3,4' etc.
+-   **query** is an array of keys that need to be fetched. Example: ['uid', 'flags', 'body.peek[headers (date)]']
+-   **options** is an optional options object
+    -   **byUid** if `true` executes `UID FETCH` instead of `FETCH`
+    -   **changedSince** is the modseq filter. Only messages with higher modseq value will be returned
+-   **callback** is the callback function to run once all me messages are processed with the following arguments
+    -   **err** is an error object, only set if the request failed
+    -   **messages** is an array of messages from the provided sequence range
 
 If callback is not specified, the method returns a Promise.
 
@@ -393,8 +389,8 @@ If callback is not specified, the method returns a Promise.
 Example
 
 ```javascript
-client.listMessages('1:10', ['uid', 'flags', 'body[]'], function(err, messages){
-    messages.forEach(function(message){
+client.listMessages('1:10', ['uid', 'flags', 'body[]'], function(err, messages) {
+    messages.forEach(function(message) {
         console.log('Flags for ' + message.uid + ': ' + message.flags.join(', '));
     });
 });
@@ -416,8 +412,8 @@ Most arguments return strings (eg. `body[]`) and numbers (eg. `uid`) while `flag
     "envelope": {
         "date": "Fri, 13 Sep 2013 15:01:00 +0300",
         "subject": "hello 4",
-        "from": [{"name": "sender name", "address": "sender@example.com"}],
-        "to": [{"name": "Receiver name", "address": "receiver@example.com"}],
+        "from": [{ "name": "sender name", "address": "sender@example.com" }],
+        "to": [{ "name": "Receiver name", "address": "receiver@example.com" }],
         "message-id": "<abcde>"
     }
 }
@@ -429,16 +425,16 @@ Most arguments return strings (eg. `body[]`) and numbers (eg. `uid`) while `flag
 
 An envelope includes the following fields (a value is only included in the response if it is set).
 
-  * **date** is a date (string) of the message
-  * **subject** is the subject of the message
-  * **from** is an array of addresses from the `from` header
-  * **sender** is an array of addresses from the `sender` header
-  * **reply-to** is an array of addresses from the `reply-to` header
-  * **to** is an array of addresses from the `to` header
-  * **cc** is an array of addresses from the `cc` header
-  * **bcc** is an array of addresses from the `bcc` header
-  * **in-reply-to** is the message-id of the message is message is replying to
-  * **message-id** is the message-id of the message
+-   **date** is a date (string) of the message
+-   **subject** is the subject of the message
+-   **from** is an array of addresses from the `from` header
+-   **sender** is an array of addresses from the `sender` header
+-   **reply-to** is an array of addresses from the `reply-to` header
+-   **to** is an array of addresses from the `to` header
+-   **cc** is an array of addresses from the `cc` header
+-   **bcc** is an array of addresses from the `bcc` header
+-   **in-reply-to** is the message-id of the message is message is replying to
+-   **message-id** is the message-id of the message
 
 All address fields are in the following format:
 
@@ -455,21 +451,21 @@ All address fields are in the following format:
 
 A bodystructure object includes the following fields (all values are lowercase, unless the value might be case sensitive, eg. Content-Id value):
 
-  * **part** is the sub-part selector for `BODY[x.x.x]`, eg. '4.1.1' (this value is not set for the root object)
-  * **type** is the Content-Type of the body part
-  * **parameters** is an object defining extra arguments for Content-Type, example: `{border: 'abc'}`
-  * **disposition** is the Content-Disposition value (without arguments)
-  * **dispositionParameters** is an object defining extra arguments for Content-Disposition, example: `{filename: 'foo.gif'}`
-  * **language** is an array of language codes (hardly ever used)
-  * **location** is a string for body content URI (hardly ever used)
-  * **id** is the Content-Id value
-  * **description** is the Content-Description value
-  * **encoding** is the Content-Transfer-Encoding value
-  * **size** is the body size in octets
-  * **lineCount** (applies to `text/*` and `message/rfc822`) is the count of lines in the body
-  * **envelope** (applies to `message/rfc822`) is the envelope object of the sub-part
-  * **md5** is the MD5 hash of the message (hardly ever used)
-  * **childNodes** (applies to `multipart/*` and `message/rfc822`) is an array of embedded bodystructure objects
+-   **part** is the sub-part selector for `BODY[x.x.x]`, eg. '4.1.1' (this value is not set for the root object)
+-   **type** is the Content-Type of the body part
+-   **parameters** is an object defining extra arguments for Content-Type, example: `{border: 'abc'}`
+-   **disposition** is the Content-Disposition value (without arguments)
+-   **dispositionParameters** is an object defining extra arguments for Content-Disposition, example: `{filename: 'foo.gif'}`
+-   **language** is an array of language codes (hardly ever used)
+-   **location** is a string for body content URI (hardly ever used)
+-   **id** is the Content-Id value
+-   **description** is the Content-Description value
+-   **encoding** is the Content-Transfer-Encoding value
+-   **size** is the body size in octets
+-   **lineCount** (applies to `text/*` and `message/rfc822`) is the count of lines in the body
+-   **envelope** (applies to `message/rfc822`) is the envelope object of the sub-part
+-   **md5** is the MD5 hash of the message (hardly ever used)
+-   **childNodes** (applies to `multipart/*` and `message/rfc822`) is an array of embedded bodystructure objects
 
 **Example**
 
@@ -520,12 +516,12 @@ client.search(query[, options], callback)
 
 Where
 
-  * **query** defines the search terms, see below
-  * **options** is an optional options object
-    * **byUid** if `true` executes `UID SEARCH` instead of `SEARCH`
-  * **callback** is the callback function to run once all me messages are processed with the following arguments
-    * **err** is an error object, only set if the request failed
-    * **results** is an array of sorted and unique message sequence numbers or UID numbers that match the specified search query
+-   **query** defines the search terms, see below
+-   **options** is an optional options object
+    -   **byUid** if `true` executes `UID SEARCH` instead of `SEARCH`
+-   **callback** is the callback function to run once all me messages are processed with the following arguments
+    -   **err** is an error object, only set if the request failed
+    -   **results** is an array of sorted and unique message sequence numbers or UID numbers that match the specified search query
 
 If callback is not specified, the method returns a Promise.
 
@@ -539,24 +535,24 @@ Examples:
 
 ```javascript
 // SEARCH UNSEEN
-query = {unseen: true}
+query = { unseen: true };
 // SEARCH KEYWORD 'flagname'
-query = {keyword: 'flagname'}
+query = { keyword: 'flagname' };
 // SEARCH HEADER 'subject' 'hello world'
-query = {header: ['subject', 'hello world']};
+query = { header: ['subject', 'hello world'] };
 // SEARCH UNSEEN HEADER 'subject' 'hello world'
-query = {unseen: true, header: ['subject', 'hello world']};
+query = { unseen: true, header: ['subject', 'hello world'] };
 // SEARCH OR UNSEEN SEEN
-query = {or: {unseen: true, seen: true}};
+query = { or: { unseen: true, seen: true } };
 // SEARCH UNSEEN NOT SEEN
-query = {unseen: true, not: {seen: true}}
+query = { unseen: true, not: { seen: true } };
 ```
 
 ### Example
 
 ```javascript
-client.search({unseen: true}, {byUid: true}, function(err, result){
-    result.forEach(function(uid){
+client.search({ unseen: true }, { byUid: true }, function(err, result) {
+    result.forEach(function(uid) {
         console.log('Message ' + uid + ' is unread');
     });
 });
@@ -572,14 +568,14 @@ client.setFlags(sequence, flags[, options], callback)
 
 Where
 
-  * **sequence** defines the range of sequence numbers or UID values (if `byUid` option is set to true). Example: '1', '1:*', '1,2:3,4' etc.
-  * **flags** is an object defining flag updates, see below for details
-  * **options** is an optional options object
-    * **byUid** if `true` executes `UID SEARCH` instead of `SEARCH`
-    * **silent** if `true` does not return anything. Useful when updating large range of messages at once (`'1:*'`)
-  * **callback** is the callback function to run once all me messages are processed with the following arguments
-    * **err** is an error object, only set if the request failed
-    * **messages** is an array of messages from the provided sequence range (or empty when `silent:true` option is set). Includes `flags` property and `uid` if `byUid:true` option was used.
+-   **sequence** defines the range of sequence numbers or UID values (if `byUid` option is set to true). Example: '1', '1:\*', '1,2:3,4' etc.
+-   **flags** is an object defining flag updates, see below for details
+-   **options** is an optional options object
+    -   **byUid** if `true` executes `UID SEARCH` instead of `SEARCH`
+    -   **silent** if `true` does not return anything. Useful when updating large range of messages at once (`'1:*'`)
+-   **callback** is the callback function to run once all me messages are processed with the following arguments
+    -   **err** is an error object, only set if the request failed
+    -   **messages** is an array of messages from the provided sequence range (or empty when `silent:true` option is set). Includes `flags` property and `uid` if `byUid:true` option was used.
 
 If callback is not specified, the method returns a Promise.
 
@@ -589,16 +585,16 @@ You can check the flags for a message or a range of messages with `listMessages`
 
 ### Flag update object
 
-  * `{ set: arrFlags }` for setting flags
-  * `{ add: arrFlags }` for adding new flags
-  * `{ remove: arrFlags }` for removing specified flags
+-   `{ set: arrFlags }` for setting flags
+-   `{ add: arrFlags }` for adding new flags
+-   `{ remove: arrFlags }` for removing specified flags
 
 Where `arrFlags` is an array containing flag strings, ie. `['\\Seen', '$MyFlag']`
 
 ### Example
 
 ```javascript
-client.setFlags('1', {add: ['\\Seen']}, function(err, result){
+client.setFlags('1', { add: ['\\Seen'] }, function(err, result) {
     console.log('New flags for message: ' + result[0].flags.join(', '));
 });
 ```
@@ -613,11 +609,11 @@ client.deleteMessages(sequence[, options], callback)
 
 Where
 
-  * **sequence** defines the range of sequence numbers or UID values (if `byUid` option is set to true). Example: '1', '1:*', '1,2:3,4' etc.
-  * **options** is an optional options object
-    * **byUid** if `true` uses UID values instead of sequence numbers to define the range
-  * **callback** is the callback function to run once all me messages are processed with the following arguments
-    * **err** is an error object, only set if the request failed
+-   **sequence** defines the range of sequence numbers or UID values (if `byUid` option is set to true). Example: '1', '1:\*', '1,2:3,4' etc.
+-   **options** is an optional options object
+    -   **byUid** if `true` uses UID values instead of sequence numbers to define the range
+-   **callback** is the callback function to run once all me messages are processed with the following arguments
+    -   **err** is an error object, only set if the request failed
 
 If callback is not specified, the method returns a Promise.
 
@@ -629,10 +625,10 @@ messages are not included in the specified sequence range.
 ### Example
 
 ```javascript
-client.deleteMessages('1:5', function(err){
-    if(err){
+client.deleteMessages('1:5', function(err) {
+    if (err) {
         console.log('Command failed');
-    }else{
+    } else {
         console.log('Messages were deleted');
     }
 });
@@ -648,20 +644,20 @@ client.copyMessages(sequence, destination[, options], callback)
 
 Where
 
-  * **sequence** defines the range of sequence numbers or UID values (if `byUid` option is set to true). Example: '1', '1:*', '1,2:3,4' etc.
-  * **destination** is the destination folder path. Example: '[Gmail]/Trash'
-  * **options** is an optional options object
-    * **byUid** if `true` uses UID values instead of sequence numbers to define the range
-  * **callback** is the callback function to run once all me messages are processed with the following arguments
-    * **err** is an error object, only set if the request failed
-    * **message** nothing useful, just the response text from the server
+-   **sequence** defines the range of sequence numbers or UID values (if `byUid` option is set to true). Example: '1', '1:\*', '1,2:3,4' etc.
+-   **destination** is the destination folder path. Example: '[Gmail]/Trash'
+-   **options** is an optional options object
+    -   **byUid** if `true` uses UID values instead of sequence numbers to define the range
+-   **callback** is the callback function to run once all me messages are processed with the following arguments
+    -   **err** is an error object, only set if the request failed
+    -   **message** nothing useful, just the response text from the server
 
 If callback is not specified, the method returns a Promise.
 
 ### Example
 
 ```javascript
-client.copyMessages('1:5', '[Gmail]/Trash', function(err){
+client.copyMessages('1:5', '[Gmail]/Trash', function(err) {
     console.log('Messages were copied to [Gmail]/Trash');
 });
 ```
@@ -676,12 +672,12 @@ client.moveMessages(sequence, destination[, options], callback)
 
 Where
 
-  * **sequence** defines the range of sequence numbers or UID values (if `byUid` option is set to true). Example: '1', '1:*', '1,2:3,4' etc.
-  * **destination** is the destination folder path. Example: '[Gmail]/Trash'
-  * **options** is an optional options object
-    * **byUid** if `true` uses UID values instead of sequence numbers to define the range
-  * **callback** is the callback function to run once all me messages are processed with the following arguments
-    * **err** is an error object, only set if the request failed
+-   **sequence** defines the range of sequence numbers or UID values (if `byUid` option is set to true). Example: '1', '1:\*', '1,2:3,4' etc.
+-   **destination** is the destination folder path. Example: '[Gmail]/Trash'
+-   **options** is an optional options object
+    -   **byUid** if `true` uses UID values instead of sequence numbers to define the range
+-   **callback** is the callback function to run once all me messages are processed with the following arguments
+    -   **err** is an error object, only set if the request failed
 
 If callback is not specified, the method returns a Promise.
 
@@ -693,10 +689,10 @@ The returned list of sequence numbers might not match with the sequence numbers 
 ### Example
 
 ```javascript
-client.moveMessages('1:5', '[Gmail]/Trash', function(err){
-    if(err){
+client.moveMessages('1:5', '[Gmail]/Trash', function(err) {
+    if (err) {
         console.log('Command failed');
-    }else{
+    } else {
         console.log('Messages were moved to [Gmail]/Trash');
     }
 });
@@ -709,18 +705,18 @@ Message updates can be listened for by setting the `onupdate` handler. First arg
 **Example**
 
 ```javascript
-client.onupdate = function(type, value){
+client.onupdate = function(type, value) {
     if (type == 'exists') {
         console.log(value + ' messages exists in selected mailbox');
     }
-}
+};
 ```
 
 Possible types:
 
-  * **exists** is emitted on untagged `EXISTS` response, `value` is the argument number used
-  * **expunge** is emitted on untagged `EXPUNGE` response, `value` is the sequence number of the deleted message
-  * **fetch** is emitted on flag change. `value` includes the parsed message object (probably includes only the sequence number `#` and `flags` array)
+-   **exists** is emitted on untagged `EXISTS` response, `value` is the argument number used
+-   **expunge** is emitted on untagged `EXPUNGE` response, `value` is the sequence number of the deleted message
+-   **fetch** is emitted on flag change. `value` includes the parsed message object (probably includes only the sequence number `#` and `flags` array)
 
 ## Mailbox change notifications
 
@@ -734,13 +730,13 @@ For `onclosemailbox` handler the argument is the path of the selected mailbox.
 **Example**
 
 ```javascript
-client.onselectmailbox = function(path, mailbox){
+client.onselectmailbox = function(path, mailbox) {
     console.log('Opened %s with %s messages', path, mailbox.exists);
-}
+};
 
-client.onclosemailbox = function(path){
+client.onclosemailbox = function(path) {
     console.log('Closed %s', path);
-}
+};
 ```
 
 ## Close connection
@@ -779,14 +775,15 @@ imap.search({
 ```
 
 A `precheck` callback receives two arguments:
-* **ctx** is a context parameter, i.e. a pointer to the current position in the command queue
-* **next** callback to be invoked when the precheck is done
 
-Calls issued in a `precheck` callback will be executed *before* the parent call, if you pass the `ctx` parameter received as a argument of the `precheck` callback to the query options. This bypasses the internal FIFO queue and executes the call on the spot! *If the context parameter is left blank, the calls will be queued as usual*.
+-   **ctx** is a context parameter, i.e. a pointer to the current position in the command queue
+-   **next** callback to be invoked when the precheck is done
+
+Calls issued in a `precheck` callback will be executed _before_ the parent call, if you pass the `ctx` parameter received as a argument of the `precheck` callback to the query options. This bypasses the internal FIFO queue and executes the call on the spot! _If the context parameter is left blank, the calls will be queued as usual_.
 
 Invoke `next` once you're done with the `precheck` callback to resume normal operation.
 
-If you want to *remove* a call from the FIFO queue, e.g. because a message is no longer available in a mailbox, pass in an error to the `next` callback. The parent call will not be executed and you will receive the error passed to next in the callback of the parent call.
+If you want to _remove_ a call from the FIFO queue, e.g. because a message is no longer available in a mailbox, pass in an error to the `next` callback. The parent call will not be executed and you will receive the error passed to next in the callback of the parent call.
 
 Example:
 

@@ -1,52 +1,54 @@
 {
-  "name": "browserbox2",
-  "version": "1.0.0",
-  "author": {
-    "name": "Andris Reinman",
-    "email": "andris@kreata.ee"
-  },
-  "bugs": {
-    "url": "https://github.com/whiteout-io/browserbox/issues"
-  },
-  "dependencies": {
-    "axe-logger": "0.0.2",
-    "mimefuncs": "0.3.9",
-    "tcp-socket": "0.5.8",
-    "wo-imap-handler": "0.1.14",
-    "wo-utf7": "2.0.2"
-  },
-  "description": "IMAP client for browsers.",
-  "devDependencies": {
-    "chai": "4.2.0",
-    "es6-promise": "4.2.8",
-    "grunt": "1.0.4",
-    "grunt-contrib-clean": "2.0.0",
-    "grunt-contrib-connect": "2.1.0",
-    "grunt-contrib-copy": "1.0.0",
-    "grunt-contrib-jshint": "2.1.0",
-    "grunt-contrib-watch": "1.1.0",
-    "grunt-mocha-phantomjs": "4.0.0",
-    "grunt-mocha-test": "0.13.3",
-    "hoodiecrow": "1.3.30",
-    "mocha": "6.2.2",
-    "node-forge": "0.9.1",
-    "phantomjs": "2.1.7",
-    "requirejs": "2.3.6",
-    "sinon": "7.5.0",
-    "wo-stringencoding": "0.1.1"
-  },
-  "homepage": "https://github.com/whiteout-io/browserbox",
-  "keywords": [
-    "IMAP"
-  ],
-  "license": "MIT",
-  "main": "src/browserbox",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/whiteout-io/browserbox.git"
-  },
-  "scripts": {
-    "pretest": "cd node_modules/node-forge/ && npm install && npm run minify && cd ../..",
-    "test": "grunt"
-  }
+    "name": "browserbox2",
+    "version": "1.0.1",
+    "author": {
+        "name": "Andris Reinman",
+        "email": "andris@kreata.ee"
+    },
+    "bugs": {
+        "url": "https://github.com/whiteout-io/browserbox/issues"
+    },
+    "dependencies": {
+        "mimefuncs": "0.3.9",
+        "nodemailer": "^6.3.1",
+        "wo-imap-handler": "0.1.14",
+        "wo-utf7": "2.0.2"
+    },
+    "description": "IMAP client not for browsers but for node.",
+    "devDependencies": {
+        "chai": "4.2.0",
+        "es6-promise": "4.2.8",
+        "eslint": "^6.7.0",
+        "eslint-config-nodemailer": "^1.2.0",
+        "eslint-config-prettier": "^6.7.0",
+        "grunt": "1.0.4",
+        "grunt-contrib-clean": "2.0.0",
+        "grunt-contrib-connect": "2.1.0",
+        "grunt-contrib-copy": "1.0.0",
+        "grunt-contrib-jshint": "2.1.0",
+        "grunt-contrib-watch": "1.1.0",
+        "grunt-mocha-phantomjs": "4.0.0",
+        "grunt-mocha-test": "0.13.3",
+        "hoodiecrow": "1.3.30",
+        "mocha": "6.2.2",
+        "node-forge": "0.9.1",
+        "phantomjs": "2.1.7",
+        "requirejs": "2.3.6",
+        "sinon": "7.5.0",
+        "wo-stringencoding": "0.1.1"
+    },
+    "homepage": "https://github.com/whiteout-io/browserbox",
+    "keywords": [
+        "IMAP"
+    ],
+    "license": "MIT",
+    "main": "src/browserbox",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/whiteout-io/browserbox.git"
+    },
+    "scripts": {
+        "pretest": "cd node_modules/node-forge/ && npm install && npm run minify && cd ../..",
+        "test": "grunt"
+    }
 }

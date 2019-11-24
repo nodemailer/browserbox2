@@ -1,3 +1,6 @@
+/* eslint no-unused-expressions: 0, global-require: 0, object-shorthand:0 */
+/* global define, sinon */
+
 'use strict';
 
 (function(factory) {
@@ -6,18 +9,18 @@
     } else if (typeof exports === 'object') {
         module.exports = factory(require('sinon'), require('chai'), require('axe-logger'), require('browserbox-imap'), require('mimefuncs'));
     }
-}(function(sinon, chai, axe, ImapClient, mimefuncs) {
-    var expect = chai.expect;
+})(function(sinon, chai, axe, ImapClient, mimefuncs) {
+    let expect = chai.expect;
     chai.Assertion.includeStack = true;
 
-    var host = 'localhost';
-    var port = 10000;
+    let host = 'localhost';
+    let port = 10000;
 
     describe('browserbox imap unit tests', function() {
         // don't log in the tests
         axe.removeAppender(axe.defaultAppender);
 
-        var client, TCPSocket, openStub, socketStub;
+        let client, TCPSocket, openStub, socketStub;
 
         /* jshint indent:false */
 
@@ -52,10 +55,10 @@
 
         describe('#connect', function() {
             it('should not throw', function() {
-                var client = new ImapClient(host, port);
+                let client = new ImapClient(host, port);
                 client._TCPSocket = {
                     open: function() {
-                        var socket = {
+                        let socket = {
                             onopen: function() {},
                             onerror: function() {}
                         };
@@ -115,9 +118,16 @@
 
                 client.exec('a', 'b', 'c', 'd');
 
-                expect(client._addToClientQueue.withArgs({
-                    command: 'a'
-                }, 'b', 'c', 'd').callCount).to.equal(1);
+                expect(
+                    client._addToClientQueue.withArgs(
+                        {
+                            command: 'a'
+                        },
+                        'b',
+                        'c',
+                        'd'
+                    ).callCount
+                ).to.equal(1);
 
                 client._addToClientQueue.restore();
             });
@@ -125,7 +135,7 @@
 
         describe('#setHandler', function() {
             it('should set global handler for keyword', function() {
-                var handler = function() {};
+                let handler = function() {};
                 client.setHandler('fetch', handler);
 
                 expect(client._globalAcceptUntagged.FETCH).to.equal(handler);
@@ -200,18 +210,14 @@
 
         describe('#_onData', function() {
             it('should process normal input', function() {
-                var list = [
-                        '* 1 FETCH (UID 1)',
-                        '* 2 FETCH (UID 2)',
-                        '* 3 FETCH (UID 3)',
-                    ],
+                let list = ['* 1 FETCH (UID 1)', '* 2 FETCH (UID 2)', '* 3 FETCH (UID 3)'],
                     pos = 0;
 
                 sinon.stub(client, '_addToServerQueue', function(cmd) {
                     expect(list[pos++]).to.equal(cmd);
                 });
 
-                for (var i = 0; i < list.length; i++) {
+                for (let i = 0; i < list.length; i++) {
                     client._onData({
                         data: mimefuncs.toTypedArray(list[i] + '\r\n').buffer
                     });
@@ -221,20 +227,16 @@
             });
 
             it('should process chunked input', function() {
-                var input = ['* 1 FETCH (UID 1)\r\n* 2 F', 'ETCH (UID 2)\r\n* 3 FETCH (UID 3', ')\r\n'];
+                let input = ['* 1 FETCH (UID 1)\r\n* 2 F', 'ETCH (UID 2)\r\n* 3 FETCH (UID 3', ')\r\n'];
 
-                var output = [
-                        '* 1 FETCH (UID 1)',
-                        '* 2 FETCH (UID 2)',
-                        '* 3 FETCH (UID 3)'
-                    ],
+                let output = ['* 1 FETCH (UID 1)', '* 2 FETCH (UID 2)', '* 3 FETCH (UID 3)'],
                     pos = 0;
 
                 sinon.stub(client, '_addToServerQueue', function(cmd) {
                     expect(output[pos++]).to.equal(cmd);
                 });
 
-                for (var i = 0; i < input.length; i++) {
+                for (let i = 0; i < input.length; i++) {
                     client._onData({
                         data: mimefuncs.toTypedArray(input[i]).buffer
                     });
@@ -244,18 +246,16 @@
             });
 
             it('should process split input', function() {
-                var input = ['* 1 ', 'F', 'ETCH (', 'UID 1)', '\r', '\n'];
+                let input = ['* 1 ', 'F', 'ETCH (', 'UID 1)', '\r', '\n'];
 
-                var output = [
-                        '* 1 FETCH (UID 1)'
-                    ],
+                let output = ['* 1 FETCH (UID 1)'],
                     pos = 0;
 
                 sinon.stub(client, '_addToServerQueue', function(cmd) {
                     expect(output[pos++]).to.equal(cmd);
                 });
 
-                for (var i = 0; i < input.length; i++) {
+                for (let i = 0; i < input.length; i++) {
                     client._onData({
                         data: mimefuncs.toTypedArray(input[i]).buffer
                     });
@@ -265,22 +265,16 @@
             });
 
             it('chould process chunked literals', function() {
-                var input = [
-                    '* 1 FETCH (UID {1}\r\n1)\r\n* 2 FETCH (UID {4}\r\n2345)\r\n* 3 FETCH (UID {4}', '\r\n3789)\r\n'
-                ];
+                let input = ['* 1 FETCH (UID {1}\r\n1)\r\n* 2 FETCH (UID {4}\r\n2345)\r\n* 3 FETCH (UID {4}', '\r\n3789)\r\n'];
 
-                var output = [
-                        '* 1 FETCH (UID {1}\r\n1)',
-                        '* 2 FETCH (UID {4}\r\n2345)',
-                        '* 3 FETCH (UID {4}\r\n3789)'
-                    ],
+                let output = ['* 1 FETCH (UID {1}\r\n1)', '* 2 FETCH (UID {4}\r\n2345)', '* 3 FETCH (UID {4}\r\n3789)'],
                     pos = 0;
 
                 sinon.stub(client, '_addToServerQueue', function(cmd) {
                     expect(output[pos++]).to.equal(cmd);
                 });
 
-                for (var i = 0; i < input.length; i++) {
+                for (let i = 0; i < input.length; i++) {
                     client._onData({
                         data: mimefuncs.toTypedArray(input[i]).buffer
                     });
@@ -320,7 +314,7 @@
 
         describe('#_processServerQueue', function() {
             it('should process a tagged item from the queue', function(done) {
-                var ref = client._processServerQueue.bind(client);
+                let ref = client._processServerQueue.bind(client);
 
                 sinon.stub(client, '_sendRequest');
 
@@ -328,16 +322,17 @@
                     expect(response).to.deep.equal({
                         tag: 'OK',
                         command: 'Hello',
-                        attributes: [{
-                            type: 'ATOM',
-                            value: 'world!'
-                        }]
+                        attributes: [
+                            {
+                                type: 'ATOM',
+                                value: 'world!'
+                            }
+                        ]
                     });
                     return callback();
                 });
 
                 sinon.stub(client, '_processServerQueue', function() {
-
                     expect(client._sendRequest.callCount).to.equal(1);
                     expect(client._processServerResponse.callCount).to.equal(1);
 
@@ -352,7 +347,7 @@
             });
 
             it('should process an untagged item from the queue', function(done) {
-                var ref = client._processServerQueue.bind(client);
+                let ref = client._processServerQueue.bind(client);
 
                 sinon.stub(client, '_sendRequest');
 
@@ -367,7 +362,6 @@
                 });
 
                 sinon.stub(client, '_processServerQueue', function() {
-
                     expect(client._sendRequest.callCount).to.equal(1);
                     expect(client._processServerResponse.callCount).to.equal(1);
 
@@ -382,11 +376,10 @@
             });
 
             it('should process a plus tagged item from the queue', function(done) {
-                var ref = client._processServerQueue.bind(client);
+                let ref = client._processServerQueue.bind(client);
                 sinon.stub(client, 'send');
 
                 sinon.stub(client, '_processServerQueue', function() {
-
                     expect(client.send.withArgs('literal data\r\n').callCount).to.equal(1);
 
                     client._processServerQueue.restore();
@@ -414,10 +407,12 @@
                     command: 'test'
                 });
 
-                expect(client._globalAcceptUntagged.TEST.withArgs({
-                    tag: '*',
-                    command: 'test'
-                }).callCount).to.equal(1);
+                expect(
+                    client._globalAcceptUntagged.TEST.withArgs({
+                        tag: '*',
+                        command: 'test'
+                    }).callCount
+                ).to.equal(1);
 
                 client._processResponse.restore();
                 client._globalAcceptUntagged.TEST.restore();
@@ -436,10 +431,12 @@
                     command: 'test'
                 });
 
-                expect(client._globalAcceptUntagged.TEST.withArgs({
-                    tag: '*',
-                    command: 'test'
-                }).callCount).to.equal(1);
+                expect(
+                    client._globalAcceptUntagged.TEST.withArgs({
+                        tag: '*',
+                        command: 'test'
+                    }).callCount
+                ).to.equal(1);
 
                 client._processResponse.restore();
                 client._globalAcceptUntagged.TEST.restore();
@@ -455,16 +452,21 @@
                         TEST: []
                     }
                 };
-                client._processServerResponse({
-                    tag: '*',
-                    command: 'test'
-                }, function() {});
+                client._processServerResponse(
+                    {
+                        tag: '*',
+                        command: 'test'
+                    },
+                    function() {}
+                );
 
                 expect(client._globalAcceptUntagged.TEST.callCount).to.equal(0);
-                expect(client._currentCommand.payload.TEST).to.deep.equal([{
-                    tag: '*',
-                    command: 'test'
-                }]);
+                expect(client._currentCommand.payload.TEST).to.deep.equal([
+                    {
+                        tag: '*',
+                        command: 'test'
+                    }
+                ]);
 
                 client._processResponse.restore();
                 client._globalAcceptUntagged.TEST.restore();
@@ -478,7 +480,6 @@
                 client._currentCommand = {
                     tag: 'A',
                     callback: function(response) {
-
                         expect(response).to.deep.equal({
                             tag: 'A',
                             command: 'test',
@@ -491,10 +492,13 @@
                         TEST: 'abc'
                     }
                 };
-                client._processServerResponse({
-                    tag: 'A',
-                    command: 'test'
-                }, function() {});
+                client._processServerResponse(
+                    {
+                        tag: 'A',
+                        command: 'test'
+                    },
+                    function() {}
+                );
 
                 expect(client._globalAcceptUntagged.TEST.callCount).to.equal(0);
 
@@ -511,13 +515,18 @@
                 client._clientQueue = [];
                 client._canSend = true;
 
-                var cb = function() {};
+                let cb = function() {};
 
-                client._addToClientQueue({
-                    command: 'abc'
-                }, ['def'], {
-                    t: 1
-                }, cb);
+                client._addToClientQueue(
+                    {
+                        command: 'abc'
+                    },
+                    ['def'],
+                    {
+                        t: 1
+                    },
+                    cb
+                );
 
                 expect(client._sendRequest.callCount).to.equal(1);
                 expect(client._clientQueue.length).to.equal(1);
@@ -538,13 +547,18 @@
                 client._clientQueue = [];
                 client._canSend = false;
 
-                var cb = function() {};
+                let cb = function() {};
 
-                client._addToClientQueue({
-                    command: 'abc'
-                }, ['def'], {
-                    t: 1
-                }, cb);
+                client._addToClientQueue(
+                    {
+                        command: 'abc'
+                    },
+                    ['def'],
+                    {
+                        t: 1
+                    },
+                    cb
+                );
 
                 expect(client._sendRequest.callCount).to.equal(0);
                 expect(client._clientQueue.length).to.equal(1);
@@ -570,12 +584,14 @@
                 sinon.stub(client, '_clearIdle');
                 sinon.stub(client, 'send');
 
-                client._clientQueue = [{
-                    request: {
-                        tag: 'W101',
-                        command: 'TEST'
+                client._clientQueue = [
+                    {
+                        request: {
+                            tag: 'W101',
+                            command: 'TEST'
+                        }
                     }
-                }];
+                ];
                 client._sendRequest();
 
                 expect(client._clearIdle.callCount).to.equal(1);
@@ -589,16 +605,20 @@
                 sinon.stub(client, '_clearIdle');
                 sinon.stub(client, 'send');
 
-                client._clientQueue = [{
-                    request: {
-                        tag: 'W101',
-                        command: 'TEST',
-                        attributes: [{
-                            type: 'LITERAL',
-                            value: 'abc'
-                        }]
+                client._clientQueue = [
+                    {
+                        request: {
+                            tag: 'W101',
+                            command: 'TEST',
+                            attributes: [
+                                {
+                                    type: 'LITERAL',
+                                    value: 'abc'
+                                }
+                            ]
+                        }
                     }
-                }];
+                ];
                 client._sendRequest();
 
                 expect(client._clearIdle.callCount).to.equal(1);
@@ -612,28 +632,32 @@
                 sinon.stub(client, '_clearIdle');
 
                 client._canSend = true;
-                client._clientQueue = [{
-                    request: {
-                        tag: 'W101',
-                        command: 'TEST',
-                        attributes: [{
-                            type: 'LITERAL',
-                            value: 'abc'
-                        }]
-                    },
-                    precheck: function(ctx) {
-                        expect(ctx).to.exist;
-                        expect(client._canSend).to.be.true;
-                        client._sendRequest = function() {
-                            expect(client._clientQueue.length).to.equal(2);
-                            expect(client._clientQueue[0].tag).to.include('.p');
-                            expect(client._clientQueue[0].request.tag).to.include('.p');
-                            client._clearIdle.restore();
-                            done();
-                        };
-                        client._addToClientQueue({}, undefined, {ctx: ctx});
+                client._clientQueue = [
+                    {
+                        request: {
+                            tag: 'W101',
+                            command: 'TEST',
+                            attributes: [
+                                {
+                                    type: 'LITERAL',
+                                    value: 'abc'
+                                }
+                            ]
+                        },
+                        precheck: function(ctx) {
+                            expect(ctx).to.exist;
+                            expect(client._canSend).to.be.true;
+                            client._sendRequest = function() {
+                                expect(client._clientQueue.length).to.equal(2);
+                                expect(client._clientQueue[0].tag).to.include('.p');
+                                expect(client._clientQueue[0].request.tag).to.include('.p');
+                                client._clearIdle.restore();
+                                done();
+                            };
+                            client._addToClientQueue({}, undefined, { ctx: ctx });
+                        }
                     }
-                }];
+                ];
                 client._sendRequest();
             });
         });
@@ -651,13 +675,15 @@
 
         describe('#_processResponse', function() {
             it('should set humanReadable', function() {
-                var response = {
+                let response = {
                     tag: '*',
                     command: 'OK',
-                    attributes: [{
-                        type: 'TEXT',
-                        value: 'Some random text'
-                    }]
+                    attributes: [
+                        {
+                            type: 'TEXT',
+                            value: 'Some random text'
+                        }
+                    ]
                 };
                 client._processResponse(response);
 
@@ -665,25 +691,32 @@
             });
 
             it('should set response code', function() {
-                var response = {
+                let response = {
                     tag: '*',
                     command: 'OK',
-                    attributes: [{
-                        type: 'ATOM',
-                        section: [{
+                    attributes: [
+                        {
                             type: 'ATOM',
-                            value: 'CAPABILITY'
-                        }, {
-                            type: 'ATOM',
-                            value: 'IMAP4REV1'
-                        }, {
-                            type: 'ATOM',
-                            value: 'UIDPLUS'
-                        }]
-                    }, {
-                        type: 'TEXT',
-                        value: 'Some random text'
-                    }]
+                            section: [
+                                {
+                                    type: 'ATOM',
+                                    value: 'CAPABILITY'
+                                },
+                                {
+                                    type: 'ATOM',
+                                    value: 'IMAP4REV1'
+                                },
+                                {
+                                    type: 'ATOM',
+                                    value: 'UIDPLUS'
+                                }
+                            ]
+                        },
+                        {
+                            type: 'TEXT',
+                            value: 'Some random text'
+                        }
+                    ]
                 };
                 client._processResponse(response);
                 expect(response.code).to.equal('CAPABILITY');
@@ -698,4 +731,4 @@
             });
         });
     });
-}));
+});
