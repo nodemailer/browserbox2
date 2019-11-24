@@ -214,8 +214,6 @@ ImapClient.prototype.onidle = function() {};
  * Initiate a connection to the server. Wait for onready event
  */
 ImapClient.prototype.connect = function() {
-    // FIXME: use Node socket
-
     let opts = {
         port: this.port,
         host: this.host
@@ -227,12 +225,20 @@ ImapClient.prototype.connect = function() {
     });
 
     this.socket = tcpHandler.connect(opts, () => {
+        if (this.socket.authorizationError) {
+            this.logger.error(
+                { tnx: 'starttls', err: new Error(this.socket.authorizationError) },
+                `Server certificate verification failed (${this.socket.authorizationError})`
+            );
+        }
         this._onOpen();
     });
 
     this.socket.on('error', err => this._onError(err));
+
+    this.onSocketTimeout = (...args) => this._onTimeout(...args);
     this.socket.setTimeout(SOCKET_TIMEOUT);
-    this.socket.on('timeout', () => this._onTimeout());
+    this.socket.on('timeout', this.onSocketTimeout);
 };
 
 /**
@@ -250,12 +256,50 @@ ImapClient.prototype.close = function() {
  * Closes the connection to the server
  */
 ImapClient.prototype.upgrade = function(callback) {
-    if (this.secureMode) {
+    if (this.secureMode || this.secure) {
         return callback(null, false);
     }
-    this.secureMode = true;
-    this.socket.upgradeToSecure();
-    callback(null, true);
+
+    // we can safely keep 'error', 'end', 'close' etc. events
+    this.socket.removeListener('data', this.onSocketData); // incoming data is going to be gibberish from this point onwards
+    this.socket.removeListener('timeout', this.onSocketTimeout); // timeout will be re-set for the new socket object
+
+    let socketPlain = this.socket;
+    let opts = {
+        socket: this.socket,
+        host: this.host
+    };
+
+    Object.keys(this.options.tls || {}).forEach(key => {
+        opts[key] = this.options.tls[key];
+    });
+
+    this.upgrading = true;
+    this.socket = tls.connect(opts, () => {
+        this.secure = true;
+        this.upgrading = false;
+
+        if (this.socket.authorizationError) {
+            this.logger.error(
+                { tnx: 'starttls', err: new Error(this.socket.authorizationError) },
+                `Server certificate verification failed (${this.socket.authorizationError})`
+            );
+        }
+
+        this.socket.on('data', this.onSocketData);
+        socketPlain.removeListener('close', this.onSocketClose);
+
+        return callback(null, true);
+    });
+
+    this.socket.on('error', err => this._onError(err));
+    this.socket.once('close', this.onSocketClose);
+
+    this.socket.setTimeout(SOCKET_TIMEOUT); // 10 min.
+    this.socket.on('timeout', this.onSocketTimeout);
+
+    // resume in case the socket was paused
+    socketPlain.resume();
 };
 
 /**
@@ -439,9 +483,11 @@ ImapClient.prototype._onData = function(chunk) {
 ImapClient.prototype._onOpen = function() {
     this.logger.info({ tnx: 'imap', cid: this.id }, `TCP socket opened to ${this.host}:${this.port}`);
 
-    this.socket.on('data', (...args) => this._onData(...args));
-    this.socket.on('close', (...args) => this._onClose(...args));
-    this.socket.on('drain', (...args) => this._onDrain(...args));
+    this.onSocketData = (...args) => this._onData(...args);
+    this.onSocketClose = (...args) => this._onClose(...args);
+
+    this.socket.on('data', this.onSocketData);
+    this.socket.on('close', this.onSocketClose);
 };
 
 // PRIVATE METHODS

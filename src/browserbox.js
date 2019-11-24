@@ -1330,10 +1330,6 @@ BrowserBox.prototype.upload = function(destination, message, options, callback) 
         ]
     };
 
-    if (flags.length) {
-        command.attributes.push(flags);
-    }
-
     let formatDate = function(date) {
         date = new Date(date);
         if (date.toString() === 'Invalid Date') {
@@ -1351,6 +1347,10 @@ BrowserBox.prototype.upload = function(destination, message, options, callback) 
 
         return `${d} ${t} +0000`;
     };
+
+    if (flags.length || options.idate) {
+        command.attributes.push(flags);
+    }
 
     if (options.idate) {
         command.attributes.push({ type: 'atom', value: formatDate(options.idate) });
