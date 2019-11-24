@@ -340,7 +340,7 @@ ImapClient.prototype.exec = function(request, acceptUntagged, options, callback)
  * @param {String} str Payload
  */
 ImapClient.prototype.send = function(str) {
-    let buffer = Buffer.from(str);
+    let buffer = Buffer.from(str, 'binary');
     this.waitDrain = !this.socket.write(buffer);
 };
 
