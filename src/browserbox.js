@@ -1358,7 +1358,7 @@ BrowserBox.prototype.upload = function(destination, message, options, callback) 
 
     command.attributes.push({
         type: 'literal',
-        value: message
+        value: message.toString('binary')
     });
 
     this.exec(
