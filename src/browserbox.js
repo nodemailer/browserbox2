@@ -533,6 +533,12 @@ BrowserBox.prototype.close = function(callback) {
         });
     }
 
+    if (this._closed) {
+        setImmediate(() => callback(null));
+        return promise;
+    }
+    this._closed = true;
+
     this.logger.info({ tnx: 'imap' }, `Closing connection`);
     this._changeState(this.STATE_LOGOUT);
 
@@ -1339,6 +1345,10 @@ BrowserBox.prototype.upload = function(destination, message, options, callback) 
             .toUTCString()
             .replace(/^\w+, 0?(\d+) (\w+) (\d+).*/, '$1-$2-$3')
             .trim();
+
+        if (/^\d-/.test(d)) {
+            d = ' ' + d;
+        }
 
         let t = date
             .toISOString()
